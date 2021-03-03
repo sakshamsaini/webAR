@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width; initial-scale=1.0;" />
+     <script type="module" src="./src/script.js"></script>
+    <title>Web AR</title>
+  </head>
+ <style>
+      body {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      margin: 0px 0px 0px 0px;
+      padding: 0;
+    }
+
+    .menu {
+      background-color: #ffffff;
+      color: black;
+      position: fixed;
+      bottom: 0;
+      right: 40%;
+      width: 80px;
+      border-radius: 50%;
+      margin-bottom: 40px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      bottom: 40px;
+      left: 5%;
+      border: 3px solid #f1f1f1;
+      z-index: 2;
+    }
+
+    .form-container {
+      padding: 10px;
+      background-color: white;
+      width: 300px;
+      height: 300px;
+      text-align: center;
+    }
+
+    .form-container .cancel {
+      background-color: red;
+      position: relative;
+      bottom: -150px;
+      margin-bottom: -100px;
+      width: 100px;
+      height: 40px;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      background: #4caf50;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      background: #4caf50;
+      cursor: pointer;
+    }
+
+    .scale{
+      background-color: #ffffff;
+      color: black;
+      position: fixed;
+      bottom: 0;
+      right: 10%;
+      width: 75px;
+      border-radius: 50%;
+      margin-bottom: 40px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .scalePopup{
+      display: none;
+      position: fixed;
+      bottom: 40px;
+      right: 5%;
+      border: 3px solid #f1f1f1;
+      z-index: 2;
+    }
+
+    .scaleForm-container{
+      padding: 10px;
+      background-color: white;
+      width: 300px;
+      height: 300px;
+      text-align: center;
+    }
+
+    .scaleForm-container .cancel_btn{
+      background-color: red;
+      position: relative;
+      bottom: -40px;
+      margin-bottom: -100px;
+      width: 100px;
+      height: 40px;
+    }
+
+    .matChange{
+      background-color: #ffffff;
+      color: black;
+      position: fixed;
+      bottom: 0;
+      left: 10%;
+      width: 85px;
+      border-radius: 50%;
+      margin-bottom: 40px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .colorChangePopup{
+      display: none;
+      position: fixed;
+      bottom: 40px;
+      right: 5%;
+      border: 3px solid #f1f1f1;
+      z-index: 2;
+    }
+
+    .colorChangeForm-container{
+      padding: 10px;
+      background-color: white;
+      width: 300px;
+      height: 300px;
+      text-align: center;
+    }
+
+     .popupClose{
+      background-color: red;
+      position: relative;
+      bottom: -110px;
+      width: 100px;
+      height: 40px;
+    }
+
+    .deleteBtn{
+      display: block;
+      bottom: 150px;
+      position: fixed;
+      right: 37%;
+    }
+
+ </style>
+  <body>
+    <script>
+      function openForm() {
+        document.getElementById("myForm").style.display = "block";
+      }
+      function closePanel() {
+        document.getElementById("myForm").style.display = "none";
+      }
+
+      function openScaleForm() {
+        document.getElementById("scaleForm").style.display = "block";
+      }
+
+      function closeScalePanel() {
+        document.getElementById("scaleForm").style.display = "none";
+      }
+
+      function openMatForm(){
+        document.getElementById("colorChangeForm").style.display = "block";
+      }
+
+      function closeColorPanel(){
+        document.getElementById("colorChangeForm").style.display = "none";
+      }
+
+    </script>
+
+    <div id = "content">
+      <button class="menu" onclick="openForm()">Open Menu</button>
+    <div class="popup" id="myForm">
+      <form class="form-container">
+        <h1>Models</h1>
+        <button type="button" id="button1" class="buttons">
+          Model1</button>
+          <button type="button" id="button2" class="buttons">
+            Model2</button>
+            <button type="button" id="button3" class="buttons">
+              Model3</button>
+        <button type="button" class="btn cancel" onclick="closePanel()">
+          Close
+          </div>
+        </button>
+      </form>
+
+    <button class="scale" onclick="openScaleForm()">Scale Model</button>
+    <div class="scalePopup" id="scaleForm">
+      <form class="scaleForm-container">
+        <h1>Scale</h1>
+        <div class="slidecontainer">
+          <p>Height:</p>
+          <input type="range" id="HeightSlider" min="1" max="5" step="0.5" />
+          </div>
+  
+          <div class="scaleSlideContainer">
+            <p>Width:</p>
+            <input type="range"id="WidthSlider" min="1" max="5" step="0.5" />
+            </div>
+        <button type="button" class="cancel_btn" onclick="closeScalePanel()">
+          Close        </button>
+      </form>
+    </div>
+
+      <button class="matChange" onclick="openMatForm()">Change Material</button>
+    <div class="colorChangePopup" id="colorChangeForm">
+      <form class="colorChangeForm-container">
+          <h1>Colors</h1>
+          <button type="button" id="color1" class="colors">
+            RED</button>
+            <button type="button" id="color2" class="colors">
+              GREEN</button>
+              <button type="button" id="color3" class="colors">
+                BLUE</button>
+                <button type="button" id="color4" class="colors">
+                  YELLOW</button>
+        <button type="button" class="popupClose" onclick="closeColorPanel()">
+          Close        </button>
+      </form>
+          </div>
+          <div>
+            <button type = "button" id="DeleteButton" class="deleteBtn">Delete Model</button>
+          </div>
+
+    </div> 
+  </body>
+</html>
