@@ -4,13 +4,13 @@ import { ARButton } from "../src/ARButton.js";
 
 let container;
 let camera, scene, renderer;
-let hitTestResults;
 let controller;
-let canRaycast = true;
+let index = 0; //Variable storing index of selected Items.
+let hitTestResults;
 let ItemInfo = {
-  button1: "./static/Models/Tree.glb",
-  button2: "../static/Models/Tree1.glb",
-  button3: "../static/Models/Tree2.glb",
+  button1: "./static/Models/Chair1/Chair1.gltf",
+  button2: "./static/Models/Chair/Chair.gltf",
+  button3: "./static/Models/Stool/Stool.gltf",
 };
 let selectedItemURL = ItemInfo.button1;
 let reticle;
@@ -20,7 +20,6 @@ let hitTestSourceRequested = false;
 let selectedObject = null;
 let spawwnedObjects = [];
 
-let btn1;
 let isBlockingUI = false;
 
 function init() {
@@ -35,8 +34,6 @@ function init() {
     0.01,
     20
   );
-
-  //btn1 = document.getElementsByClassName("menu");
 
   const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
   light.position.set(0.5, 1, 0.25);
@@ -53,51 +50,98 @@ function init() {
   );
 
   //Selection Function
-  let mouse = new THREE.Vector2();
-  let raycast = new THREE.Raycaster();
   var mesh;
 
+  //On Select Function
   function onSelect() {
-    let hitObject = Raycast();
-    // if (hitObject) {
-    //   selectedObject = hitObject;
-    // } else {
-    if (reticle.visible && !isBlockingUI) {
-      loader.load(
-        selectedItemURL,
-        function (LoadModel) {
-          mesh = LoadModel.scene;
-          mesh.position.setFromMatrixPosition(reticle.matrix);
-          scene.add(mesh);
-          spawwnedObjects.push(mesh);
-        },
-        undefined,
-        function (OnError) {
-          console.log("Error " + OnError);
-        }
-      );
+    if (!isBlockingUI) {
+      if (reticle.visible && selectedItemURL != "") {
+        loader.load(
+          selectedItemURL,
+          function (LoadModel) {
+            selectedItemURL = "";
+            mesh = LoadModel.scene;
+            mesh.position.setFromMatrixPosition(reticle.matrix);
+            scene.add(mesh);
+            spawwnedObjects.push(mesh);
+            selectedObject = mesh;
+            if (spawwnedObjects.length) {
+              spawwnedObjects.forEach(element => {
+                if (element === selectedObject) {
+                  element.traverse((child) => {
+                    if (child.isMesh) {
+                      child.material.opacity = 1;
+                    }
+                  })
+                } else {
+                  element.traverse((child) => {
+                    if (child.isMesh) {
+                      child.material.opacity = 0.4;
+                    }
+                  })
+                }
+              });
+            }
+          },
+          undefined,
+          function (OnError) {
+            console.log("Error " + OnError);
+          }
+        );
+      }
     }
   }
-  //}
-  window.addEventListener("click", () => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = (event.clientY / window.innerHeight) * 2 + 1;
-  });
 
-  function Raycast() {
-    raycast.setFromCamera(mouse, camera);
-    let objects = raycast.intersectObjects(spawwnedObjects);
-    spawwnedObjects.forEach((element) => {
-      if (objects[0] === element) return objects[0];
-    });
+  //Selection
+  const previousButton = document.getElementById("Previous");
+  const nextButton = document.getElementById("Next");
+
+  function OnpreviousButtonClick() {
+    if (spawwnedObjects.length) {
+      let previousIndex = spawwnedObjects.indexOf(selectedObject);
+      index = (previousIndex - 1) % spawwnedObjects.length;
+      selectedObject = spawwnedObjects[index];
+      selectedObject.traverse((child) => {
+        if (child.isMesh) {
+          child.material.opacity = 1;
+        }
+      })
+      spawwnedObjects[previousIndex].traverse((child) => {
+        if (child.isMesh) {
+          child.material.opacity = 0.4;
+        }
+      })
+    }
   }
 
-  controller = renderer.xr.getController(0);
-  controller.addEventListener("select", onSelect);
-  scene.add(controller);
+  previousButton.addEventListener("click", OnpreviousButtonClick);
 
+  function OnNextButtonClick() {
+    if (spawwnedObjects.length) {
+      let previousIndex = spawwnedObjects.indexOf(selectedObject);
+      index = (previousIndex + 1) % spawwnedObjects.length;
+      selectedObject = spawwnedObjects[index];
+      selectedObject.traverse((child) => {
+        if (child.isMesh) {
+          child.material.opacity = 1;
+        }
+      })
+      spawwnedObjects[previousIndex].traverse((child) => {
+        if (child.isMesh) {
+          child.material.opacity = 0.4;
+        }
+      })
+    }
+  }
+
+  nextButton.addEventListener("click", OnNextButtonClick);
+
+  controller = renderer.xr.getController(0);
+  controller.addEventListener('select', onSelect);
+
+  //Reticle
   reticle = new THREE.Mesh(
-    new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2),
+    new THREE.RingGeometry(0.05, 0.10, 32).rotateX(-Math.PI / 2),
     new THREE.MeshBasicMaterial()
   );
   reticle.matrixAutoUpdate = false;
@@ -144,7 +188,7 @@ function render(timestamp, frame) {
     if (hitTestSource) {
       hitTestResults = frame.getHitTestResults(hitTestSource);
 
-      if (hitTestResults.length && canRaycast) {
+      if (hitTestResults.length) {
         const hit = hitTestResults[0];
         reticle.visible = true;
         reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
@@ -166,6 +210,7 @@ function BindingSelectionEvent() {
   }
 }
 
+//UI blocking Function
 function BlockUI() {
   for (let i = 0; i < Buttons.length; i++) {
     Buttons[i].addEventListener(onmouseenter, () => {
@@ -180,19 +225,6 @@ function BlockUI() {
 
 BlockUI();
 
-//Delete Function to remove selected mesh.
-function Delete() {
-  if (selectedObject != null) {
-    scene.remove(selectedObject);
-    selectedObject = null;
-    selectedItemURL = "";
-    spawnned = false;
-  }
-}
-
-let deleteButton = document.getElementById("DeleteButton");
-deleteButton.addEventListener("click", Delete);
-
 //Object Selection
 let Colors = {
   0: "0xff0000",
@@ -205,7 +237,11 @@ let materialColor = document.getElementsByClassName("colors");
 for (let i = 0; i < materialColor.length; i++) {
   materialColor[i].addEventListener("click", () => {
     if (selectedObject != null) {
-      selectedObject.material.color.setHex(Colors[i]);
+      selectedObject.traverse((child) => {
+        if (child.isMesh) {
+          child.material.color.setHex(Colors[i]);
+        }
+      });
       selectedObject.material.needsUpdate = true;
     }
   });
