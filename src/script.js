@@ -150,6 +150,8 @@ function init() {
 
   window.addEventListener("resize", onWindowResize);
 }
+
+
 const loader = new GLTFLoader();
 
 function onWindowResize() {
@@ -248,6 +250,7 @@ for (let i = 0; i < materialColor.length; i++) {
 }
 
 let HeightSlider = document.getElementById("HeightSlider");
+console.log(HeightSlider);
 HeightSlider.addEventListener("change", () => {
   if (selectedObject != null) {
     selectedObject.scale.y = [HeightSlider.value];
